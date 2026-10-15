@@ -1,0 +1,21 @@
+{
+ "name": "creative-1-karten-hook",
+ "logo": "logo-hd.png",
+ "foto": "img/foto-hd-herde-weide.jpg",
+ "fokus": [
+  0.3,
+  0.45
+ ],
+ "karte": "img/karte.jpg",
+ "primary": "#003264",
+ "headline": [
+  "HERDEN-",
+  "MANAGER"
+ ],
+ "headline_zusatz": "(m/w/d)",
+ "pill": [
+  "Ohne Lebenslauf &",
+  "Anschreiben!"
+ ],
+ "ort": "Bargischow · Anklam · Wolgast & Umgebung"
+}

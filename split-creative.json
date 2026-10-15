@@ -1,0 +1,45 @@
+[
+ {
+  "name": "creative-3-wir-suchen",
+  "logo": "logo-hd.png",
+  "foto": "img/foto-hd-stall-futtergang.jpg",
+  "primary": "#003264",
+  "panel": "top",
+  "panel_hoehe": 0.52,
+  "panel_bg": "#003264",
+  "kicker": "WIR SUCHEN IN BARGISCHOW BEI ANKLAM",
+  "headline": [
+   "Herdenmanager",
+   "(m/w/d)"
+  ],
+  "subline": "Für rund 1.500 Milchkühe – unbefristet, mit Wohnraum-Angebot.",
+  "cta": "Job-Angebot in 60 Sekunden erhalten",
+  "fokus": [
+   0.5,
+   0.55
+  ]
+ },
+ {
+  "name": "creative-4-checkliste",
+  "logo": "logo-hd.png",
+  "foto": "img/foto-hd-fressgitter.jpg",
+  "primary": "#003264",
+  "panel": "bottom",
+  "panel_hoehe": 0.58,
+  "panel_bg": "#FFFFFF",
+  "kicker": "WIR SUCHEN BEI ANKLAM",
+  "headline": [
+   "Herdenmanager (m/w/d)"
+  ],
+  "checkliste": [
+   "Unbefristeter Vertrag in Vollzeit",
+   "Wohnraum-Angebot & Hilfe bei der Wohnungssuche",
+   "Betriebliche Altersvorsorge"
+  ],
+  "cta": "Job-Angebot in 60 Sekunden erhalten",
+  "fokus": [
+   0.5,
+   0.5
+  ]
+ }
+]

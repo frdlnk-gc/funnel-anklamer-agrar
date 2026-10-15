@@ -1,0 +1,36 @@
+{
+ "name": "creative-2-collage",
+ "logo": "logo-hd.png",
+ "fotos": [
+  "img/foto-hd-herde-weide.jpg",
+  "img/foto-hd-fressgitter.jpg",
+  "img/foto-hd-stall-futtergang.jpg"
+ ],
+ "fokus": [
+  [
+   0.3,
+   0.45
+  ],
+  [
+   0.5,
+   0.5
+  ],
+  [
+   0.5,
+   0.5
+  ]
+ ],
+ "primary": "#003264",
+ "ink": "#1B1B1B",
+ "headline": [
+  "Herden-",
+  "manager"
+ ],
+ "headline_zusatz": "(m/w/d)",
+ "ort": "Bargischow · Anklam · Wolgast",
+ "cta": [
+  "Jetzt unverbindliches",
+  "Job-Angebot erhalten –",
+  "mit 1 Klick!"
+ ]
+}
