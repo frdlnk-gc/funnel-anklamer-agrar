@@ -1,0 +1,122 @@
+{
+  "firma": "Anklamer Agrar AG",
+  "stelle": "Herdenmanager (m/w/d)",
+  "ort": "Bargischow",
+  "plz": "17398",
+  "branche": "landwirtschaft",
+  "farbe_primary": "#003264",
+  "farbe_secondary": "#649114",
+  "region_badge": "Bargischow & Umgebung",
+  "benefit_top": "Unbefristet & Wohnraum-Angebot",
+  "benefits": [
+    "Unbefristeter Arbeitsvertrag in Vollzeit",
+    "Wohnraum-Angebot (kostenlos oder entgeltlich) & Hilfe bei der Wohnungssuche",
+    "Betriebliche Altersvorsorge",
+    "Flexible Arbeitszeiten",
+    "Firmenhandy",
+    "Flache Hierarchien & Betriebsausflüge"
+  ],
+  "aufgaben": [
+    "Du steuerst eigenverantwortlich das Herdenmanagement für rund 1.500 Milchkühe",
+    "Du sicherst die Tiergesundheit und betreust Frischmelker sowie Tiere mit besonderem Betreuungsbedarf",
+    "Du analysierst und überwachst die Herdenkennzahlen und dokumentierst die Ergebnisse",
+    "Du führst dein Team, unterstützt das Fruchtbarkeitsmanagement und übernimmst bei Bedarf Besamungen"
+  ],
+  "anforderung": "Landwirtschaftliches Studium, Fachschulausbildung oder vergleichbarer Abschluss – dazu Erfahrung im Gesundheits- und Fruchtbarkeitsmanagement von Milchkühen. Eigenbestandsbesamer-Lizenz von Vorteil, aber kein Muss.",
+  "fachrichtungen_frage": "Was ist dein beruflicher Hintergrund?",
+  "fachrichtungen": [
+    {
+      "label": "Milchviehhaltung",
+      "icon": "🐄",
+      "qualifikationen": [
+        {
+          "label": "Landwirtschaftliches Studium",
+          "icon": "🎓"
+        },
+        {
+          "label": "Fachschulausbildung",
+          "icon": "📘"
+        },
+        {
+          "label": "Vergleichbarer Abschluss",
+          "icon": "🏅"
+        },
+        {
+          "label": "Erfahren ohne Abschluss",
+          "icon": "💪"
+        }
+      ]
+    },
+    {
+      "label": "Andere Landwirtschaft",
+      "icon": "🚜",
+      "qualifikationen": [
+        {
+          "label": "Landwirtschaftliches Studium",
+          "icon": "🎓"
+        },
+        {
+          "label": "Fachschulausbildung",
+          "icon": "📘"
+        },
+        {
+          "label": "Vergleichbarer Abschluss",
+          "icon": "🏅"
+        },
+        {
+          "label": "Erfahren ohne Abschluss",
+          "icon": "💪"
+        }
+      ]
+    },
+    {
+      "label": "Anderer Bereich",
+      "icon": "🔄",
+      "qualifikationen": [
+        {
+          "label": "Studium in anderem Fach",
+          "icon": "🎓"
+        },
+        {
+          "label": "Ausbildung in anderem Beruf",
+          "icon": "📘"
+        },
+        {
+          "label": "Erfahren ohne Abschluss",
+          "icon": "💪"
+        }
+      ]
+    }
+  ],
+  "ueber": {
+    "fakten": [
+      {
+        "zahl": "1.500",
+        "label": "Milchkühe"
+      },
+      {
+        "zahl": "42",
+        "label": "Mitarbeiter"
+      },
+      {
+        "zahl": "2000",
+        "label": "gegründet"
+      }
+    ],
+    "text": "Die Anklamer Agrar AG ist ein landwirtschaftlicher Betrieb mit Schwerpunkt Milchviehhaltung in Bargischow bei Anklam. Rund 1.500 Milchkühe werden in einem leistungsfähigen Melkkarussell gemolken. Im Mittelpunkt stehen Tierwohl, eine gute Versorgung der Tiere und eine wirtschaftliche, nachhaltige Milchproduktion."
+  },
+  "kunde_tab": "19 Anklamer Agrar AG",
+  "quelle": "https://anklamer-agrar.green-careers.de",
+  "logo": "logo.png",
+  "karte": {
+    "bild": "img/karte.jpg",
+    "label": "Bargischow"
+  },
+  "hero_bild": "img/hero-herde-weide.jpg",
+  "bilder": [
+    "img/f1-stall-futtergang.jpg",
+    "img/f2-fressgitter.jpg",
+    "img/f3-liegebereich.jpg",
+    "img/f4-herde-weide.jpg"
+  ]
+}

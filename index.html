@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<!--
+  GreenCareers Kunden-Funnel – MASTER-TEMPLATE
+  ============================================
+  Wird NIE direkt deployt. Befüllung ausschließlich über build.py (Variablen-Austausch).
+
+  Platzhalter (HTML-Kontext) – im Template als doppelt-geschweifte Marker, hier ohne
+  Klammern notiert, damit build.py diesen Kommentar nicht mit ersetzt:
+    FIRMA, LOGO_IMG, FARBE_PRIMARY, FARBE_SECONDARY, STELLE, ORT,
+    BENEFIT_TOP, BENEFITS_LISTE, AUFGABEN_KURZ, ANFORDERUNG_KURZ,
+    IMPRESSUM_URL, DATENSCHUTZ_URL
+  Medien (optional, von build.py aus daten.json erzeugt – leer wenn Kunde keine Medien hat):
+    HERO_PHOTO_CLASS + HERO_PHOTO_STYLE  -> Hero-Hintergrundfoto (Banner der Anzeige)
+    GALERIE_SEKTION                      -> horizontale Foto-Galerie (echte Kundenfotos)
+    VIDEO_SEKTION                        -> Video-Karte (mp4 lokal oder YouTube/Vimeo-Embed)
+    Fotos/Videos liegen als Dateien in img/ neben der index.html (NICHT Base64 – nur das Logo
+    wird eingebettet). Alle Medien stammen aus der Stellenanzeige des Kunden.
+  Platzhalter (JS-Kontext, quote-sicher als EIN JSON-Objekt):
+    CFG_JSON            -> {webhook, kunde_tab, kunde, stelle, quelle}
+    FACHRICHTUNGEN_JSON -> [{label, icon}, ...] für Schritt 1
+
+  Pflicht-Muster (nicht entfernen):
+  - Meta-IAB-Autoscroll-Fix: PLZ- und Kontakt-Felder liegen in <template> und werden
+    erst bei der ersten echten Quiz-Interaktion gemountet (In-App-Browser von
+    Instagram/Facebook scrollt sonst beim Laden zum Formular).
+  - Kontrast-Automatik: JS misst die Luminanz von --primary und setzt --on-primary /
+    --primary-text passend (helle CI-Farben bekommen dunklen Text).
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#003264">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAERklEQVR42u3ZS2wbRRgA4H9md+31I3ac99PNi7zUQN2kSThESVPaAxfSShAkJJAAcUFc4ILgAL2AxIEDQhUIJFIOVEIgSotaVWpKmkcREJImaUhwkxBS1yEvu37te2c4mDhOMAZxoZFmTrvz+He+3Z1/pR1EKYX9XDDs88IADMAADMAADMAADMAADMAADMAADMAADMAADLAvC7/nfC0UPfP5t5KiIYR2QQntf7TD1+AllOLdTfcX4L1zg2+dHoBcJ5gkbfoI4vLw9OKNT15F9/kTiMRl3pMj5LuMNADGiNhFRdUAAP2n25/8gYwAKIU9AShAsmJPU5ae2QCCwFEA3TANzQBCgFBACAQMuoExznRVmpFEt6cLQFFaD4T+HLLdYWf4ThMFhHZOs8w+0xOISWYkxrntbrfD7bQ77BZJ1mKSEtmMqJr+11gIIdMkHIcBQFF10SrA3puNkk2yprvsYlxW3U4bbEdACMmqzieHa3qOXUxKTJOkeqYChmOSQ7RYBD4boK+nQ1dBMdSYJOXYRI/b2Vxd6mv0Ou2i1cKnYr1+5qsXHz/68fnRtqYD4ZikaDqHsWjheZ472eMbnvAv3t1oqa2Y9K+UFeTeWQ+trIaaa8o0XZ9dWu1sqek/fuSbkalQNHGsvfmds5dffur4+aGbvwY3n+/rGp9brqso2rwXv/rDXLev/okTbZfGZrzFeaIozC+tdrc2/APgYR/uajvqEqviEv3+1vzw5NyV7269+9nVAof4dF/XwdpyAFi4s355eLq5uiy4ce+1axNPnjhyfcLvcdlf6u/9cXaZ4/DFkanl4JbLYfvwy+scxn09hwJr4VO9h4fG56d+Wan3FiEEF4anNM2IS2plcd7QuN+/srYU2PhtdevSyExDVUmhxzlzO/BQfQUABNZCpkmsAl9fVTK7FOxsqUmfMNqzQ3N28JVrNz/qaHyss/Hk4dpTycqV30MDF8ZmFu6ee/sFnsMDF8f8/oDOcw9UFkmKthaK1lYUYoS3IvHl4KavwTu7GLTbLCahD9aVUwBZ0W5ML7Q2VfEcDkel6rKC3vamNz742uUQK0s8Py+u1nmLeR4TQsPRhKLpAOC0Wa0WwVuSd6y9aXTytmgVRAu/Ho4X57m6W+uzAb4YPf3p4JsWAUwCpR5v18FnHjn0bKG7CtKWbPJdN02i6oZdtOiGiRDiOZyQ1YSiyYp2oDQfAKIJxeUQAUAzTElWE4pWkOu0CrykaDyHk2+CYZJYQva4HCYhHMZbkXi+2wkACVl12KySolkEjuc4ACCExmU1GTAbYCsWuPLT+4apIoQ1Q9Z0qbyguaflObvVw3EIba/e1ML9uyyUnFAqC2VMUzTTN5EQijBCuxNdluyN/s0mHyEmxlyWHI9SyZ7S1LciPZFnk+zuljzOmDQzViK2S8kADMAADMAADMAADMAADMAADMAADMAADMAADPA/lD8AD1L4ua356hUAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<title>Herdenmanager (m/w/d) bei Anklamer Agrar AG in Bargischow</title>
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1986121842345009');fbq('track','PageView');</script><noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1986121842345009&ev=PageView&noscript=1"/></noscript>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#003264;
+  --secondary:#649114;
+  --on-primary:#ffffff;            /* JS passt an, wenn --primary hell ist */
+  --primary-text:var(--primary);   /* JS dunkelt ab, wenn --primary auf Weiß zu hell ist */
+  --ink:#14181c; --ink-soft:#5b6570;
+  --bg:#f6f7f8; --card:#ffffff; --line:#e4e7ea;
+  --err:#d5453c;
+  --radius:16px;
+  --shadow:0 6px 22px rgba(15,23,32,.07);
+  --shadow-lg:0 16px 44px rgba(15,23,32,.14);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:hidden}
+body{font-family:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto}
+a{color:var(--primary-text)}
+button{font-family:inherit}
+
+/* ---------- Scroll-Animation ---------- */
+[data-animate]{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease;transition-delay:var(--d,0s)}
+[data-animate].in-view{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  [data-animate]{opacity:1;transform:none;transition:none}
+  html{scroll-behavior:auto}
+  .cta-pulse{animation:none}.cta-pulse::after{display:none}
+  .screen{animation:none}
+}
+
+/* ---------- Topbar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tb-in{max-width:1040px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:inline-flex;align-items:center;min-width:0}
+.brand img{max-height:40px;width:auto;display:block}
+.tb-cta{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 16px;border-radius:999px;background:var(--primary);color:var(--on-primary);font-size:13.5px;font-weight:700;text-decoration:none;box-shadow:0 4px 14px rgba(15,23,32,.16)}
+
+/* Overflow-Guard (Pflicht, Freddy 21.08.): Text darf NIE über den Rand seiner Box hinausgehen */
+h1,h2,h3,h4,p,li,span,a,label,button,.badge,.hero-benefit,.htile,.option,.uf,.karte-label{min-width:0;overflow-wrap:break-word;hyphens:auto;-webkit-hyphens:auto}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;background:linear-gradient(158deg,color-mix(in srgb,var(--primary) 86%,#0b0f12) 0%,var(--primary) 52%,color-mix(in srgb,var(--primary) 74%,var(--secondary)) 100%);color:var(--on-primary);overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(620px 300px at 85% -10%,color-mix(in srgb,var(--on-primary) 14%,transparent),transparent 70%),radial-gradient(420px 260px at -10% 110%,color-mix(in srgb,var(--on-primary) 8%,transparent),transparent 70%);pointer-events:none}
+.hero-in{position:relative;max-width:720px;margin:0 auto;padding:36px 20px 42px;text-align:left}
+.hero h1 .mwd{font-size:.55em;font-weight:700;opacity:.85;white-space:nowrap}
+.badge{display:inline-block;max-width:100%;line-height:1.5;background:color-mix(in srgb,var(--on-primary) 15%,transparent);border:1px solid color-mix(in srgb,var(--on-primary) 26%,transparent);color:var(--on-primary);font-size:12.5px;font-weight:700;letter-spacing:.02em;padding:6px 12px;border-radius:16px;margin-bottom:16px}
+.hero h1{font-size:clamp(26px,7vw,40px);line-height:1.12;font-weight:800;letter-spacing:-.025em;margin-bottom:10px}
+.hero h1 .h1-sub{display:block;font-size:.58em;font-weight:700;opacity:.92;margin-top:8px;letter-spacing:-.01em}
+.hero-stellesub{font-size:14px;font-weight:600;opacity:.85;margin:-2px 0 12px}
+.hero-benefit{display:inline-block;background:var(--primary);color:var(--chip-ink,#fff);font-size:14.5px;font-weight:700;padding:9px 14px;border-radius:12px;margin-bottom:20px;max-width:100%;box-shadow:0 8px 22px rgba(0,0,0,.25)}
+.hero:not(.has-photo) .hero-benefit{background:color-mix(in srgb,var(--on-primary) 15%,transparent);color:var(--on-primary);box-shadow:none;border:1px solid color-mix(in srgb,var(--on-primary) 26%,transparent)}
+.hero-kicker{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-bottom:5px}
+.hero-q-title{font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:12px}
+.hero-tiles{display:flex;flex-direction:column;gap:9px;max-width:440px}
+.htile{display:flex;align-items:center;gap:11px;width:100%;min-height:54px;text-align:left;cursor:pointer;background:rgba(255,255,255,.97);border:1.5px solid rgba(255,255,255,.5);border-radius:14px;padding:11px 14px;font-family:inherit;font-size:15.5px;font-weight:700;color:var(--ink);box-shadow:0 10px 26px rgba(0,0,0,.25);transition:transform .12s,box-shadow .2s}
+.htile:active{transform:scale(.98)}
+.htile .ico{width:36px;height:36px;flex:none;border-radius:10px;background:color-mix(in srgb,var(--primary) 14%,#fff);display:grid;place-items:center;font-size:18px}
+.htile .arr{margin-left:auto;flex:none;color:var(--primary-text);font-weight:800;transition:transform .2s}
+.htile:hover .arr{transform:translateX(3px)}
+.osub{display:block;font-weight:600;font-size:12.5px;opacity:.62;margin-top:2px;line-height:1.3}
+.hero-micro{font-size:12.5px;font-weight:500;opacity:.78;margin-top:12px}
+/* Hero mit Kundenfoto (Banner aus der Stellenanzeige): dunkles Overlay + CI-Tint, Text immer weiß */
+.hero.has-photo{--on-primary:#fff;background-image:linear-gradient(color-mix(in srgb,var(--primary) 28%,transparent),color-mix(in srgb,var(--primary) 10%,transparent)),linear-gradient(rgba(10,13,11,.58),rgba(10,13,11,.44)),var(--hero-photo);background-size:auto,auto,cover;background-position:center;background-repeat:no-repeat}
+.hero.has-photo::before{display:none}
+
+/* ---------- Galerie (echte Kundenfotos) ---------- */
+.gal-viewport{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none;scroll-snap-type:x proximity;-webkit-mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+.gal-viewport::-webkit-scrollbar{display:none}
+.gal-track{display:flex;gap:12px;width:max-content;padding:4px 8px}
+.gal-track img{height:225px;width:auto;border-radius:16px;scroll-snap-align:start;box-shadow:var(--shadow);border:1.5px solid var(--line)}
+.gal-hint{text-align:center;font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:10px}
+
+/* ---------- Standort-Karte („Hier könnte dein neuer Arbeitsplatz sein") ---------- */
+.karte-wrap{position:relative;border-radius:var(--radius);overflow:hidden;border:1.5px solid var(--line);box-shadow:var(--shadow);max-width:720px;margin:0 auto}
+.karte-wrap img{display:block;width:100%;height:auto}
+.karte-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none}
+.karte-pin .ring{display:block;box-sizing:border-box;width:150px;height:150px;border:3.5px solid #E5484D;border-radius:50%;box-shadow:0 0 0 6px rgba(229,72,77,.14);animation:pinPulse 2.2s ease-in-out infinite}
+@keyframes pinPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.07);opacity:.85}}
+.karte-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border:1.5px solid #E5484D;color:var(--ink);font-weight:800;font-size:15px;padding:7px 14px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.18);white-space:normal;text-align:center;max-width:78%}
+.karte-credit{text-align:center;font-size:10.5px;color:#9aa5ad;margin-top:8px}
+@media (prefers-reduced-motion:reduce){.karte-pin .ring{animation:none}}
+@media (min-width:768px){.karte-pin .ring{width:190px;height:190px}}
+
+/* ---------- Über den Betrieb ---------- */
+.ueber-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:20px 18px;box-shadow:var(--shadow)}
+.ueber-fakten{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.uf{flex:1;min-width:92px;background:color-mix(in srgb,var(--primary) 9%,#fff);border-radius:12px;padding:12px 8px;text-align:center}
+.uf b{display:block;font-size:22px;font-weight:800;color:var(--primary-text);letter-spacing:-.02em}
+.uf span{font-size:12px;color:var(--ink-soft);font-weight:600}
+.ueber-text{font-size:14.5px;color:var(--ink-soft);font-weight:500}
+
+/* ---------- Video ---------- */
+.video-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:10px;box-shadow:var(--shadow);max-width:720px;margin:0 auto}
+.video-card video,.video-card iframe{display:block;width:100%;aspect-ratio:16/9;border-radius:12px;border:0;background:#000}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;border:none;cursor:pointer;font-weight:700;font-size:16.5px;min-height:52px;padding:14px 26px;border-radius:15px;text-decoration:none;transition:transform .12s,box-shadow .2s,filter .2s}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn .arrow{transition:transform .2s;flex:none}
+.btn:hover .arrow{transform:translateX(3px)}
+.btn-hero{background:var(--card);color:var(--primary-text);box-shadow:0 14px 34px rgba(0,0,0,.28)}
+.btn-primary{background:var(--primary);color:var(--on-primary);box-shadow:0 12px 28px color-mix(in srgb,var(--primary) 42%,transparent);width:100%}
+.btn-primary:hover{filter:brightness(1.05)}
+.cta-pulse{position:relative;overflow:hidden;animation:ctaPulse 2.4s ease-in-out infinite}
+.cta-pulse::after{content:"";position:absolute;top:0;left:-80%;width:55%;height:100%;background:linear-gradient(115deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:ctaShine 3s ease-in-out infinite}
+@keyframes ctaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes ctaShine{0%{left:-80%}55%{left:130%}100%{left:130%}}
+
+/* ---------- Sektionen ---------- */
+.sec{padding:40px 0}
+.sec-in{max-width:1040px;margin:0 auto;padding:0 16px}
+.sec h2{font-size:clamp(21px,5.4vw,28px);font-weight:800;letter-spacing:-.02em;margin-bottom:18px}
+
+/* Benefits */
+.benefit-grid{list-style:none;display:grid;grid-template-columns:1fr;gap:10px}
+.benefit-grid li{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:15px 16px 15px 52px;font-size:15px;font-weight:600;box-shadow:var(--shadow)}
+.benefit-grid li::before{content:"✓";position:absolute;left:14px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:9px;background:color-mix(in srgb,var(--primary) 12%,#fff);color:var(--primary-text);font-weight:800;font-size:14px;display:grid;place-items:center}
+
+/* Job-Kurzinfo */
+.jobinfo{padding-top:6px}
+.job-cards{display:grid;grid-template-columns:1fr;gap:12px}
+.job-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.job-card h3{font-size:16px;font-weight:800;margin-bottom:10px;letter-spacing:-.01em}
+.job-list{list-style:none}
+.job-list li{position:relative;padding-left:20px;font-size:14.5px;color:var(--ink-soft);font-weight:500;margin-bottom:7px}
+.job-list li:last-child{margin-bottom:0}
+.job-list li::before{content:"";position:absolute;left:2px;top:9px;width:7px;height:7px;border-radius:50%;background:var(--primary)}
+.job-req{font-size:14.5px;color:var(--ink-soft);font-weight:500}
+
+/* ---------- Funnel ---------- */
+.funnel-sec{padding-top:8px;padding-bottom:52px}
+.funnel-card{max-width:560px;margin:0 auto;background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:24px 18px 20px;box-shadow:var(--shadow-lg);scroll-margin-top:78px}
+
+/* Overlay-Modus: Kachel-/CTA-Klick öffnet den Funnel als fokussierten Vollbild-Flow
+   (kein Scrollen an Inhalten vorbei – die Seite darunter bleibt erhalten) */
+body.funnel-open{overflow:hidden}
+body.funnel-open .funnel-sec{position:fixed;inset:0;z-index:120;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 40px}
+body.funnel-open .funnel-sec .sec-in{padding:0 14px}
+body.funnel-open .funnel-card{border:0;border-radius:0;box-shadow:none;max-width:560px;padding:10px 6px 20px;scroll-margin-top:0}
+.ov-head{display:none;align-items:center;justify-content:space-between;padding:10px 2px 14px}
+body.funnel-open .ov-head{display:flex}
+.ov-head img{max-height:34px;width:auto;display:block}
+.ov-close{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:22px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 10px rgba(15,23,32,.06)}
+#ovBrand{cursor:pointer}
+.ov-close:active{transform:scale(.94)}
+
+/* Teil B: Profil vervollständigen */
+.teilb-card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:14px 14px;margin-top:10px;text-align:center}
+.teilb-card .btn-primary{background:transparent;color:var(--accent-ink,var(--primary));border:2px solid var(--primary);box-shadow:none;min-height:44px;padding:10px 18px;font-size:15px}
+.teilb-card h3{font-size:15.5px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px}
+.teilb-card p{font-size:12.5px;color:var(--ink-soft);font-weight:500;margin-bottom:10px;max-width:360px;margin-left:auto;margin-right:auto}
+.btn-ghost2{display:block;width:100%;margin-top:10px;background:transparent;border:none;color:var(--ink-soft);font-weight:600;font-size:13.5px;cursor:pointer;padding:10px;text-decoration:underline;text-underline-offset:3px}
+/* v3.5: Multi-Betrieb-Einwilligung */
+.multi-card{background:linear-gradient(160deg,#fff,color-mix(in srgb,var(--primary) 7%,#fff));border:1.5px solid color-mix(in srgb,var(--primary) 45%,#fff);border-radius:18px;padding:18px 16px;margin-top:12px;text-align:center}
+.multi-card h3{font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px}
+.multi-card p{font-size:13.5px;color:var(--ink-soft);font-weight:500;margin-bottom:12px;max-width:360px;margin-left:auto;margin-right:auto}
+.multi-check{display:flex;align-items:flex-start;gap:10px;text-align:left;font-size:13px;font-weight:600;color:var(--ink);margin:0 auto 12px;max-width:360px;cursor:pointer}
+.multi-check input{width:19px;height:19px;flex:none;margin-top:1px;accent-color:var(--primary);cursor:pointer}
+.multi-card .btn[disabled]{opacity:.45;cursor:not-allowed}
+.multi-more{display:block;max-width:360px;margin:-6px auto 10px;padding:0 0 0 29px;text-align:left;background:none;border:0;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink-soft);text-decoration:underline;cursor:pointer}
+.multi-details{max-width:360px;margin:0 auto 12px;padding-left:29px;text-align:left;font-size:12.5px;line-height:1.45;color:var(--ink-soft)}
+.multi-details[hidden]{display:none}
+.multi-details a{color:inherit;text-decoration:underline}
+.multi-done{font-size:14px;font-weight:700;color:#16A34A;padding:6px 0}
+.freitext{width:100%;font-family:inherit;font-size:16px;font-weight:500;color:var(--ink);padding:13px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;resize:none;min-height:96px;line-height:1.5;transition:border-color .15s,box-shadow .15s}
+.freitext:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 16%,transparent)}
+.freitext::placeholder{color:#9aa5ad}
+.funnel-head{text-align:center;margin-bottom:16px}
+.funnel-head h2{font-size:22px;margin-bottom:2px}
+.funnel-head p{font-size:13.5px;color:var(--ink-soft);font-weight:500}
+.fh-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;margin-top:9px;font-size:12px;font-weight:700;color:var(--ink-soft)}
+.fh-trust span::first-letter{color:#16A34A}
+.funnel-card.done-mode .funnel-head{display:none}
+.ssl-hint{text-align:center;font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:11px}
+.prog{margin-bottom:20px}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.03em;text-transform:uppercase;margin-bottom:7px}
+.prog-track{height:8px;border-radius:99px;background:#edf0f2;overflow:hidden}
+.prog-bar{height:100%;width:8%;border-radius:99px;background:var(--primary);transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+.screen{display:none;animation:fadeScreen .4s ease both}
+.screen.active{display:block}
+@keyframes fadeScreen{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+.topback{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:17px;line-height:1;display:inline-flex;align-items:center;justify-content:center;margin-bottom:12px;cursor:pointer;box-shadow:0 2px 10px rgba(15,23,32,.06);transition:transform .12s}
+.topback:active{transform:scale(.94)}
+.q-title{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:16px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:13px;width:100%;min-height:56px;text-align:left;cursor:pointer;background:var(--card);border:1.5px solid var(--line);border-radius:15px;padding:13px 15px;font-size:16px;font-weight:600;color:var(--ink);transition:border-color .15s,background .15s,box-shadow .15s}
+.opt:hover{border-color:color-mix(in srgb,var(--primary) 55%,#fff);background:color-mix(in srgb,var(--primary) 4%,#fff)}
+.opt.sel{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,#fff);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 16%,transparent)}
+.opt .ico{width:42px;height:42px;flex:none;border-radius:12px;background:color-mix(in srgb,var(--primary) 8%,#fff);display:grid;place-items:center;font-size:21px;transition:background .15s}
+.opt.sel .ico{background:color-mix(in srgb,var(--primary) 18%,#fff)}
+.opt .lbl{flex:1}
+.opt .check{width:22px;height:22px;flex:none;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;color:var(--on-primary);font-size:12px;font-weight:800;transition:all .15s}
+.opt.sel .check{background:var(--primary);border-color:var(--primary)}
+.opt.sel .check::before{content:"✓"}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:13.5px;font-weight:700;margin-bottom:6px}
+.field input{width:100%;font-family:inherit;font-size:16px;font-weight:500;color:var(--ink);padding:15px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+.field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 16%,transparent)}
+.field input.bad{border-color:var(--err)}
+.field .hint{font-size:12.5px;color:var(--ink-soft);font-weight:500;margin-top:5px}
+.consent{display:flex;gap:10px;align-items:flex-start;margin:4px 0 16px;font-size:12.5px;color:var(--ink-soft);line-height:1.45;font-weight:500}
+.consent input{margin-top:2px;width:18px;height:18px;flex:none;accent-color:var(--primary)}
+.consent a{font-weight:600}
+.form-err{display:none;background:#fdf1f0;border:1.5px solid #f3c7c4;color:var(--err);font-size:13.5px;font-weight:600;border-radius:12px;padding:11px 14px;margin-bottom:14px}
+.form-err.show{display:block}
+
+.done{text-align:center;padding:12px 6px 6px}
+.done .big{width:56px;height:56px;margin:0 auto 10px;border-radius:50%;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;font-size:27px;font-weight:800;box-shadow:var(--shadow-lg);animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+.done h2{font-size:20px;font-weight:800;margin-bottom:5px;letter-spacing:-.02em}
+.done p{font-size:13.5px;color:var(--ink-soft);font-weight:500;max-width:380px;margin:0 auto}
+
+.transparenz{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);text-align:center;font-size:12px;color:var(--ink-soft);font-weight:500;line-height:1.5}
+
+/* ---------- Footer ---------- */
+footer{background:#fff;border-top:1px solid var(--line);padding:30px 16px 34px;text-align:center}
+.foot-in{max-width:640px;margin:0 auto}
+.brand-foot img{max-height:34px;width:auto;display:inline-block;margin-bottom:10px}
+.powered{font-size:12.5px;color:var(--ink-soft);font-weight:500;margin-bottom:12px}
+.powered b{font-weight:700;color:var(--ink)}
+.foot-trans{font-size:12px;color:var(--ink-soft);line-height:1.5;margin-bottom:14px}
+.foot-links{font-size:12.5px}
+.foot-links a{color:var(--ink-soft);font-weight:600;text-decoration:none}
+.foot-links a:hover{text-decoration:underline}
+
+/* ---------- Desktop ---------- */
+@media (min-width:768px){
+  .hero-in{padding:64px 24px 66px;text-align:center}
+  .hero-q{max-width:460px;margin:0 auto}
+  .hero-tiles{margin:0 auto}
+  .sec{padding:52px 0}
+  .benefit-grid{grid-template-columns:1fr 1fr;gap:12px}
+  .job-cards{grid-template-columns:1.2fr 1fr;gap:14px}
+  .funnel-card{padding:32px 34px 26px}
+}
+@media (min-width:1024px){
+  .benefit-grid{grid-template-columns:1fr 1fr 1fr}
+  .gal-hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tb-in">
+    <span class="brand"><img src="data:image/png;base64,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" alt="Anklamer Agrar AG – Logo"></span>
+    <a class="tb-cta" href="#bewerben">Job-Angebot erhalten</a>
+  </div>
+</header>
+
+<section class="hero has-photo" style="--hero-photo:url('img/hero-herde-weide.jpg')">
+  <div class="hero-in">
+    <span class="badge" data-animate>📍 Bargischow &amp; Umgebung</span>
+    <h1 data-animate style="--d:.06s">Herdenmanager <span class="mwd">(m/w/d)</span><span class="h1-sub">bei Anklamer Agrar AG</span></h1>
+
+    <p class="hero-benefit" data-animate style="--d:.12s">Unbefristet &amp; Wohnraum-Angebot</p>
+    <div class="hero-q" data-animate style="--d:.18s">
+      <p class="hero-kicker">In 60 Sek. zum unverbindlichen Job-Angebot</p>
+      <p class="hero-q-title">Was ist dein beruflicher Hintergrund?</p>
+      <div class="hero-tiles" id="heroFach"></div>
+    </div>
+    <p class="hero-micro" data-animate style="--d:.24s">Ohne Lebenslauf. Ohne Anschreiben. Job-Angebot in unter 7 Tagen.</p>
+  </div>
+</section>
+
+<main>
+<section class="sec">
+  <div class="sec-in">
+    <h2 data-animate>Das bietet dir Anklamer Agrar AG</h2>
+    <ul class="benefit-grid" data-animate style="--d:.08s">
+      <li>Unbefristeter Arbeitsvertrag in Vollzeit</li>
+      <li>Wohnraum-Angebot (kostenlos oder entgeltlich) &amp; Hilfe bei der Wohnungssuche</li>
+      <li>Betriebliche Altersvorsorge</li>
+      <li>Flexible Arbeitszeiten</li>
+      <li>Firmenhandy</li>
+      <li>Flache Hierarchien &amp; Betriebsausflüge</li>
+    </ul>
+  </div>
+</section>
+<section class="sec galerie" id="einblicke">
+  <div class="sec-in">
+    <h2 data-animate>Einblicke bei Anklamer Agrar AG</h2>
+    <div class="gal-viewport" data-animate style="--d:.08s"><div class="gal-track">
+      <img src="img/f1-stall-futtergang.jpg" alt="Anklamer Agrar AG – Einblick 1" loading="lazy">
+      <img src="img/f2-fressgitter.jpg" alt="Anklamer Agrar AG – Einblick 2" loading="lazy">
+      <img src="img/f3-liegebereich.jpg" alt="Anklamer Agrar AG – Einblick 3" loading="lazy">
+      <img src="img/f4-herde-weide.jpg" alt="Anklamer Agrar AG – Einblick 4" loading="lazy">
+    </div></div>
+    <p class="gal-hint">→ Wischen für mehr Fotos</p>
+  </div>
+</section>
+<section class="sec jobinfo" id="job">
+  <div class="sec-in">
+    <div class="job-cards">
+      <div class="job-card" data-animate>
+        <h3>Deine Aufgaben</h3>
+        <ul class="job-list">
+      <li>Du steuerst eigenverantwortlich das Herdenmanagement für rund 1.500 Milchkühe</li>
+      <li>Du sicherst die Tiergesundheit und betreust Frischmelker sowie Tiere mit besonderem Betreuungsbedarf</li>
+      <li>Du analysierst und überwachst die Herdenkennzahlen und dokumentierst die Ergebnisse</li>
+      <li>Du führst dein Team, unterstützt das Fruchtbarkeitsmanagement und übernimmst bei Bedarf Besamungen</li>
+        </ul>
+      </div>
+      <div class="job-card" data-animate style="--d:.08s">
+        <h3>Das bringst du mit</h3>
+        <p class="job-req">Landwirtschaftliches Studium, Fachschulausbildung oder vergleichbarer Abschluss – dazu Erfahrung im Gesundheits- und Fruchtbarkeitsmanagement von Milchkühen. Eigenbestandsbesamer-Lizenz von Vorteil, aber kein Muss.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="sec ueber-sec">
+  <div class="sec-in">
+    <h2 data-animate>Über Anklamer Agrar AG</h2>
+    <div class="ueber-card" data-animate style="--d:.08s"><div class="ueber-fakten"><div class="uf"><b>1.500</b><span>Milchkühe</span></div><div class="uf"><b>42</b><span>Mitarbeiter</span></div><div class="uf"><b>2000</b><span>gegründet</span></div></div><p class="ueber-text">Die Anklamer Agrar AG ist ein landwirtschaftlicher Betrieb mit Schwerpunkt Milchviehhaltung in Bargischow bei Anklam. Rund 1.500 Milchkühe werden in einem leistungsfähigen Melkkarussell gemolken. Im Mittelpunkt stehen Tierwohl, eine gute Versorgung der Tiere und eine wirtschaftliche, nachhaltige Milchproduktion.</p></div>
+  </div>
+</section>
+
+<section class="sec funnel-sec" id="bewerben">
+  <div class="sec-in">
+    <div class="funnel-card" id="funnelCard">
+      <div class="ov-head"><span id="ovBrand" role="button" tabindex="0" title="Zurück zur Startseite" aria-label="Zurück zur Startseite"></span><button type="button" class="ov-close" id="ovClose" aria-label="Schließen">×</button></div>
+      <div class="funnel-head">
+        <h2>Dein unverbindliches Job-Angebot</h2>
+        <p>In unter 7 Tagen – inkl. Gehalt &amp; allen Benefits.</p>
+        <p class="fh-trust"><span>✓ 100&nbsp;% diskret</span><span>✓ Geprüfter Arbeitgeber</span><span>✓ Kostenlos</span></p>
+      </div>
+      <div class="prog" id="prog">
+        <div class="prog-label"><span id="progStep">Schritt 1 von 3</span></div>
+        <div class="prog-track"><div class="prog-bar" id="progBar"></div></div>
+      </div>
+
+      <noscript><p style="text-align:center;font-weight:600">Bitte aktiviere JavaScript, um dich zu bewerben.</p></noscript>
+
+      <section class="screen active" id="s-fach">
+        <p class="q-title">Was ist dein beruflicher Hintergrund?</p>
+        <div class="options" id="fachOptions"></div>
+      </section>
+
+      <section class="screen" id="s-quali">
+        <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+        <p class="q-title">Was ist deine Qualifikation?</p>
+        <div class="options" id="qualiOptions"></div>
+      </section>
+
+      <section class="screen" id="s-erfahrung">
+        <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+        <p class="q-title">Wie viel Berufserfahrung hast du?</p>
+        <div class="options">
+          <button type="button" class="opt" data-field="erfahrung" data-value="Unter 2 Jahre"><span class="ico">🌱</span><span class="lbl">Unter 2 Jahre</span><span class="check"></span></button>
+          <button type="button" class="opt" data-field="erfahrung" data-value="2–5 Jahre"><span class="ico">🌿</span><span class="lbl">2–5 Jahre</span><span class="check"></span></button>
+          <button type="button" class="opt" data-field="erfahrung" data-value="5–10 Jahre"><span class="ico">🌳</span><span class="lbl">5–10 Jahre</span><span class="check"></span></button>
+          <button type="button" class="opt" data-field="erfahrung" data-value="Über 10 Jahre"><span class="ico">🏆</span><span class="lbl">Über 10 Jahre</span><span class="check"></span></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-fs">
+        <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+        <p class="q-title">Hast du einen Führerschein?</p>
+        <div class="options" id="fsOptions"></div>
+      </section>
+
+      <section class="screen" id="s-plz"><div id="plzMount"></div></section>
+      <section class="screen" id="s-kontakt"><div id="kontaktMount"></div></section>
+
+      <section class="screen" id="s-done">
+        <div class="done">
+          <div class="big">✓</div>
+          <h2>Dein Job-Angebot ist unterwegs!</h2>
+          <p><span id="doneName"></span>Anklamer Agrar AG meldet sich innerhalb von 24–48 Stunden bei dir – dein Job-Angebot bekommst du in unter 7 Tagen.</p>
+        </div>
+        <div class="multi-card multiCard" id="multiCardDone">
+          <h3>Weitere Top-Betriebe kennenlernen 🚀</h3>
+          <p>Sollen wir dein Profil auch anderen geprüften Betrieben in deiner Nähe vorstellen? 100 % diskret.</p>
+          <label class="multi-check"><input type="checkbox" class="multiConsent"><span>Ja, GreenCareers darf mein Profil passenden Betrieben in meiner Nähe vorstellen und mir passende Stellen &amp; Karriere-Tipps per E-Mail schicken.</span></label>
+          <button type="button" class="multi-more" aria-expanded="false" onclick="gcMultiMore(this)">Mehr dazu ▾</button>
+          <div class="multi-details" hidden>Wir stellen dein Profil nur geprüften Betrieben in deiner Region vor – dein aktueller Arbeitgeber erfährt nichts. Per E-Mail bekommst du passende Stellenangebote und alle 2–4 Wochen Karriere-Tipps. Abmelden geht in jeder Mail mit einem Klick. Verantwortlich: GreenCareers GmbH · <a href="https://www.green-careers.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a></div>
+          <button type="button" class="btn btn-primary multiBtn" disabled>Weitere Top-Betriebe kennenlernen <span class="arrow">→</span></button>
+        </div>
+        <div class="teilb-card">
+          <h3>Profil vervollständigen 🎯</h3>
+          <p>2 schnelle Fragen – damit Anklamer Agrar AG dir das bestmögliche Angebot machen kann.</p>
+          <button type="button" class="btn btn-primary" id="teilbStart">Jetzt vervollständigen <span class="arrow">→</span></button>
+        </div>
+      </section>
+
+      <section class="screen" id="s-b1">
+        <p class="q-title">Ab wann könntest du starten?</p>
+        <div class="options" id="b1Options"></div>
+      </section>
+
+      <section class="screen" id="s-b2">
+        <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+        <p class="q-title">Wie ist deine aktuelle Situation?</p>
+        <div class="options" id="b2Options"></div>
+      </section>
+
+      <section class="screen" id="s-b4"><div id="b4Mount"></div></section>
+
+      <section class="screen" id="s-fertig">
+        <div class="done">
+          <div class="big">🎯</div>
+          <h2>Stark – Profil vollständig!</h2>
+          <p>Anklamer Agrar AG hat jetzt alles und meldet sich innerhalb von 24–48 Stunden bei dir.</p>
+        </div>
+        <div class="multi-card multiCard">
+          <h3>Weitere Top-Betriebe kennenlernen 🚀</h3>
+          <p>Sollen wir dein Profil auch anderen geprüften Betrieben in deiner Nähe vorstellen? 100 % diskret.</p>
+          <label class="multi-check"><input type="checkbox" class="multiConsent"><span>Ja, GreenCareers darf mein Profil passenden Betrieben in meiner Nähe vorstellen und mir passende Stellen &amp; Karriere-Tipps per E-Mail schicken.</span></label>
+          <button type="button" class="multi-more" aria-expanded="false" onclick="gcMultiMore(this)">Mehr dazu ▾</button>
+          <div class="multi-details" hidden>Wir stellen dein Profil nur geprüften Betrieben in deiner Region vor – dein aktueller Arbeitgeber erfährt nichts. Per E-Mail bekommst du passende Stellenangebote und alle 2–4 Wochen Karriere-Tipps. Abmelden geht in jeder Mail mit einem Klick. Verantwortlich: GreenCareers GmbH · <a href="https://www.green-careers.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a></div>
+          <button type="button" class="btn btn-primary multiBtn" disabled>Weitere Top-Betriebe kennenlernen <span class="arrow">→</span></button>
+        </div>
+        <button type="button" class="btn-ghost2" id="fertigClose">Nein danke – fertig</button>
+      </section>
+
+      <p class="transparenz">Die Bewerbung läuft über GreenCareers – den Recruiting-Partner der Anklamer Agrar AG. Deine Daten gehen direkt an Anklamer Agrar AG.</p>
+    </div>
+  </div>
+</section>
+<section class="sec karte-sec">
+  <div class="sec-in">
+    <h2 data-animate>Hier könnte dein neuer Arbeitsplatz sein</h2>
+    <div class="karte-wrap" data-animate style="--d:.08s">
+      <img src="img/karte.jpg" alt="Karte: Bargischow und Umgebung" loading="lazy">
+      <div class="karte-pin"><span class="ring"></span></div>
+      <span class="karte-label">📍 Bargischow</span>
+    </div>
+    <p class="karte-credit">Kartendaten © OpenStreetMap-Mitwirkende</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="foot-in">
+    <span class="brand-foot"><img src="data:image/png;base64,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" alt="Anklamer Agrar AG – Logo"></span>
+    <p class="powered">powered by <b>GreenCareers</b></p>
+    <p class="foot-trans">Die Bewerbung läuft über GreenCareers – den Recruiting-Partner der Anklamer Agrar AG. Deine Daten gehen direkt an Anklamer Agrar AG.</p>
+    <p class="foot-links"><a href="https://www.green-careers.de/impressum" target="_blank" rel="noopener">Impressum</a> &nbsp;·&nbsp; <a href="https://www.green-careers.de/datenschutz" target="_blank" rel="noopener">Datenschutz</a></p>
+  </div>
+</footer>
+
+<!-- Meta-IAB-Fix: Eingabefelder erst bei echter Interaktion mounten -->
+<template id="tpl-plz">
+  <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+  <p class="q-title">Wo wohnst du?</p>
+  <form id="plzForm" novalidate>
+    <div class="field">
+      <label for="plzInput">PLZ oder Wohnort</label>
+      <input id="plzInput" name="plz_ort" type="text" inputmode="text" autocomplete="postal-code" placeholder="z. B. 44135 oder Dortmund" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Weiter <span class="arrow">→</span></button>
+  </form>
+</template>
+
+<template id="tpl-b4">
+  <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+  <p class="q-title">Möchtest du Anklamer Agrar AG noch etwas mitgeben?</p>
+  <form id="b4Form" novalidate>
+    <div class="field">
+      <textarea class="freitext" id="bNachricht" placeholder="Optional – z. B. Qualifikationen, Scheine oder was dir wichtig ist."></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" id="profilBtn">Profil absenden <span class="arrow">→</span></button>
+  </form>
+</template>
+
+<template id="tpl-kontakt">
+  <button type="button" class="topback" data-back aria-label="Zurück">←</button>
+  <p class="q-title">Wer soll das unverbindliche Job-Angebot erhalten?</p>
+  <form id="kontaktForm" novalidate>
+    <div class="form-err" id="formErr"></div>
+    <div class="field">
+      <label for="fName">Vor- und Nachname</label>
+      <input id="fName" name="name" type="text" autocomplete="name" placeholder="Max Mustermann" required>
+    </div>
+    <div class="field">
+      <label for="fTel">Handynummer (WhatsApp)</label>
+      <input id="fTel" name="telefon" type="tel" inputmode="tel" autocomplete="tel" placeholder="0151 23456789" required>
+      <p class="hint">100&nbsp;% diskret – dein aktueller Arbeitgeber erfährt nichts.</p>
+    </div>
+    <div class="field">
+      <label for="fMail">E-Mail</label>
+      <input id="fMail" name="email" type="email" inputmode="email" autocomplete="email" placeholder="max@beispiel.de" required>
+    </div>
+    <label class="consent">
+      <input type="checkbox" id="fConsent" required>
+      <span>Ich habe die <a href="https://www.green-careers.de/datenschutz" target="_blank" rel="noopener">Datenschutzerklärung</a> gelesen und bin einverstanden, dass meine Angaben zur Kontaktaufnahme gespeichert werden.</span>
+    </label>
+    <button type="submit" class="btn btn-primary" id="submitBtn">Jetzt Job-Angebot erhalten <span class="arrow">→</span></button>
+    <p class="ssl-hint">🔒 Sichere SSL-Verschlüsselung &amp; 100&nbsp;% diskret</p>
+  </form>
+</template>
+
+<script>
+"use strict";
+var CFG = {"webhook": "https://hook.eu1.make.com/qbgtbw4765qldxs6k603mznvra7ml7s9", "kunde_tab": "19 Anklamer Agrar AG", "kunde": "Anklamer Agrar AG", "stelle": "Herdenmanager (m/w/d)", "quelle": "https://anklamer-agrar.green-careers.de"};
+/* Multi-Einwilligung (v3 seit 07.09.2026): Kurz-Label + aufklappbare Details („Mehr dazu"). Deckt Vorstellung bei Betrieben UND Stellen-/Karriere-Mails von GreenCareers (Newsletter). Wortlaut = Label der .multiConsent-Checkbox + Details; bei Änderung Version hochziehen. */
+var MULTI_CONSENT_TEXT = "Ja, GreenCareers darf mein Profil passenden Betrieben in meiner Nähe vorstellen und mir passende Stellen & Karriere-Tipps per E-Mail schicken. | Details: Wir stellen dein Profil nur geprüften Betrieben in deiner Region vor – dein aktueller Arbeitgeber erfährt nichts. Per E-Mail bekommst du passende Stellenangebote und alle 2–4 Wochen Karriere-Tipps. Abmelden geht in jeder Mail mit einem Klick. Verantwortlich: GreenCareers GmbH · Datenschutzerklärung: https://www.green-careers.de/datenschutz";
+function gcMultiMore(b){var d=b.nextElementSibling,o=d.hasAttribute('hidden');if(o){d.removeAttribute('hidden')}else{d.setAttribute('hidden','')}b.setAttribute('aria-expanded',o?'true':'false');b.textContent=o?'Weniger anzeigen ▴':'Mehr dazu ▾';}
+var MULTI_CONSENT_VERSION = '2026-09-07';
+var FACHRICHTUNGEN = [{"label": "Milchviehhaltung", "icon": "🐄", "qualifikationen": [{"label": "Landwirtschaftliches Studium", "icon": "🎓"}, {"label": "Fachschulausbildung", "icon": "📘"}, {"label": "Vergleichbarer Abschluss", "icon": "🏅"}, {"label": "Erfahren ohne Abschluss", "icon": "💪"}]}, {"label": "Andere Landwirtschaft", "icon": "🚜", "qualifikationen": [{"label": "Landwirtschaftliches Studium", "icon": "🎓"}, {"label": "Fachschulausbildung", "icon": "📘"}, {"label": "Vergleichbarer Abschluss", "icon": "🏅"}, {"label": "Erfahren ohne Abschluss", "icon": "💪"}]}, {"label": "Anderer Bereich", "icon": "🔄", "qualifikationen": [{"label": "Studium in anderem Fach", "icon": "🎓"}, {"label": "Ausbildung in anderem Beruf", "icon": "📘"}, {"label": "Erfahren ohne Abschluss", "icon": "💪"}]}];
+var STELLEN = [];   /* >1 Eintrag = kombinierte Kampagne: Stellen-Auswahl als Frage 1 */
+var QUALIFIKATIONEN = [{"label": "Ausgelernt", "icon": "🎓"}, {"label": "Meister / Techniker", "icon": "🏅"}, {"label": "Erfahren ohne Ausbildung", "icon": "💪"}, {"label": "Quereinsteiger", "icon": "🔄"}];
+var FUEHRERSCHEIN = [{"label": "Ja, Klasse B", "icon": "🚗"}, {"label": "Ja, Klasse B + BE", "icon": "🚚"}, {"label": "Ja, Klasse C/CE (LKW)", "icon": "🚛"}, {"label": "Nein", "icon": "❌"}];
+var ZUSATZ = {"verfuegbarkeit": [{"label": "Sofort", "icon": "⚡"}, {"label": "Innerhalb von 4 Wochen", "icon": "📅"}, {"label": "In 1–3 Monaten", "icon": "🗓️"}, {"label": "Muss ich klären", "icon": "🤔"}], "situation": [{"label": "In Festanstellung", "icon": "💼"}, {"label": "Arbeitssuchend", "icon": "🔍"}, {"label": "In Ausbildung / Umschulung", "icon": "🎓"}, {"label": "Selbstständig", "icon": "🛠️"}]};
+
+/* Lead-ID für den Teil-B-Upsert (gleiche Mechanik wie die GC-Bewerber-LPs) */
+function gcUuid(){
+  try{ return crypto.randomUUID(); }catch(e){}
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+    var r=Math.random()*16|0, v=c==='x'?r:(r&3|8); return v.toString(16);
+  });
+}
+var LEAD_ID=(function(){
+  try{
+    var id=sessionStorage.getItem('gcf_lead_id');
+    if(!id){ id=gcUuid(); sessionStorage.setItem('gcf_lead_id',id); }
+    return id;
+  }catch(e){ return gcUuid(); }
+})();
+
+/* ---------- 1st-Party Funnel-Tracking (GC-Dashboard, quiz_funnel_events) ----------
+   Gleicher Vertrag wie die allgemeinen Bewerber-LPs (bewerbung/index.html): lp_view beim
+   Laden, slide_view je Screen-Wechsel, form_start bei der ersten Interaktion,
+   lead_captured beim Haupt-Submit, profile_completed nach Teil B, submit_success/
+   'multi-betrieb' bei der Multi-Betrieb-Einwilligung. Erst damit ist der Trichter der
+   Kundenfunnel genauso auswertbar wie der der allgemeinen Funnel — vorher gab es je Kunde
+   nur die nackte Meta-Lead-Zahl (Auswertung 26.08.2026).
+   landingpage_id = 'kundenfunnel-<slug>': je Kunde einzeln UND ueber
+   like 'kundenfunnel-%' gemeinsam auswertbar.
+   Nur live auf *.green-careers.de aktiv. Metas Ad-Review-Crawler filtert der Endpoint
+   serverseitig per IP (AS32934) — clientseitig ist dafuer nichts noetig.
+   Tracking darf den Funnel NIE brechen: alles in try/catch, fetch mit .catch(). */
+var GC_FUNNEL_ENDPOINT='https://gc-tracking-dashboard.vercel.app/api/recruiting/funnel-event';
+var GC_FUNNEL_LIVE=/(^|\.)green-careers\.de$/.test(location.hostname);
+var GC_FUNNEL_LP_ID=(function(){
+  /* Slug aus dem Host: josef-poetter.green-careers.de -> kundenfunnel-josef-poetter.
+     Faellt der Host aus (lokaler Test, Preview), aus CFG.quelle ableiten — damit ein
+     Testlauf nicht unter einer fremden landingpage_id landet. */
+  var h=location.hostname;
+  if(!/(^|\.)green-careers\.de$/.test(h)){
+    try{ h=String(CFG.quelle||'').replace(/^https?:\/\//,'').split('/')[0]; }catch(e){ h=''; }
+  }
+  var slug=String(h||'').split('.')[0];
+  return slug ? 'kundenfunnel-'+slug : 'kundenfunnel-unbekannt';
+})();
+var GC_FUNNEL_SESSION=(function(){
+  try{
+    var s=sessionStorage.getItem('gc_session_id');
+    if(!s){ s=gcUuid(); sessionStorage.setItem('gc_session_id',s); }
+    return s;
+  }catch(e){ return gcUuid(); }
+})();
+var GC_FUNNEL_UTM=(function(){
+  var out={}, p;
+  try{ p=new URLSearchParams(location.search); }catch(e){ return out; }
+  ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','fbclid','gclid'].forEach(function(k){
+    var v=p.get(k); if(v) out[k]=v;
+  });
+  /* Meta haengt ad_id/campaign_name statt utm_* an — als Fallback mappen, damit die
+     UTM-Filter im Dashboard greifen (gleiche Logik wie in bewerbung/index.html). */
+  if(!out.utm_source && (p.get('ad_id')||out.fbclid)) out.utm_source='meta';
+  if(!out.utm_campaign && p.get('campaign_name')) out.utm_campaign=p.get('campaign_name');
+  if(!out.utm_content && p.get('ad_name')) out.utm_content=p.get('ad_name');
+  return out;
+})();
+function gcFunnelTrack(eventType,slideId){
+  try{
+    var body={
+      event_type:eventType, slide_id:slideId||null, landingpage_id:GC_FUNNEL_LP_ID,
+      session_id:GC_FUNNEL_SESSION, referrer:document.referrer||'',
+      page_url:location.href, user_agent:navigator.userAgent
+    };
+    Object.keys(GC_FUNNEL_UTM).forEach(function(k){ body[k]=GC_FUNNEL_UTM[k]; });
+    if(!GC_FUNNEL_LIVE){ if(window.TRACK_DEBUG) console.log('[FUNNEL]',eventType,slideId||''); return; }
+    fetch(GC_FUNNEL_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body),keepalive:true,credentials:'omit'}).catch(function(){});
+  }catch(e){}
+}
+gcFunnelTrack('lp_view',null);
+
+/* ---------- Kontrast-Automatik (helle CI-Farben) ---------- */
+(function(){
+  function lum(hex){
+    hex=(hex||'').replace('#','').trim();
+    if(hex.length===3) hex=hex.split('').map(function(c){return c+c;}).join('');
+    if(hex.length!==6) return 0;
+    var v=[0,2,4].map(function(i){
+      var c=parseInt(hex.substr(i,2),16)/255;
+      return c<=0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055,2.4);
+    });
+    return 0.2126*v[0]+0.7152*v[1]+0.0722*v[2];
+  }
+  try{
+    var p=getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    var L=lum(p), r=document.documentElement.style;
+    if(L>0.42) r.setProperty('--on-primary','#14181c');
+    r.setProperty('--chip-ink', L>0.42 ? '#14181c' : '#ffffff');
+    /* Helle Markenfarbe (Gelb & Co.): Text-Akzente neutral dunkel statt schmutzigem Mischton */
+    if(L>0.45) r.setProperty('--primary-text','#14181c');
+    else if(L>0.4) r.setProperty('--primary-text','color-mix(in srgb, var(--primary) 55%, #14181c)');
+  }catch(e){}
+})();
+
+/* ---------- Scroll-Animationen ---------- */
+(function(){
+  var els=document.querySelectorAll('[data-animate]');
+  /* QA-Modus für Screenshots (Playwright/Abnahme): ?static=1 deaktiviert Animationen */
+  if(location.search.indexOf('static=1')>-1){
+    var st=document.createElement('style');
+    st.textContent='html{scroll-behavior:auto !important}[data-animate]{opacity:1 !important;transform:none !important;transition:none !important}.cta-pulse{animation:none !important}.cta-pulse::after{display:none !important}';
+    document.head.appendChild(st);
+    return;
+  }
+  if(!('IntersectionObserver' in window)){ els.forEach(function(el){el.classList.add('in-view');}); return; }
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in-view'); io.unobserve(en.target); } });
+  },{threshold:.15});
+  els.forEach(function(el){ io.observe(el); });
+})();
+
+/* ---------- Funnel ---------- */
+var S={stelle:null,fachrichtung:null,qualifikation:null,erfahrung:null,plz_ort:'',name:'',telefon:'',email:'',verfuegbarkeit:null,fuehrerschein:null,situation:null,nachricht:''};
+var MULTI_STELLE = STELLEN.length>1;
+var NEXT={'s-stelle':'s-fach','s-fach':'s-quali','s-quali':'s-erfahrung','s-erfahrung':'s-fs','s-fs':'s-plz','s-plz':'s-kontakt','s-b1':'s-b2','s-b2':'s-b4'};
+var LABELS={'s-stelle':'Schritt 1 von 3','s-fach':'Schritt 1 von 3','s-quali':'Schritt 1 von 3','s-erfahrung':'Schritt 2 von 3','s-fs':'Schritt 2 von 3','s-plz':'Schritt 3 von 3','s-kontakt':'Schritt 3 von 3','s-done':'Fertig','s-b1':'Profil · Frage 1 von 2','s-b2':'Profil · Frage 2 von 2','s-b4':'Profil · fast fertig','s-fertig':'Profil komplett'};
+var PROG = MULTI_STELLE
+  ? {'s-stelle':6,'s-fach':18,'s-quali':30,'s-erfahrung':44,'s-fs':58,'s-plz':72,'s-kontakt':86,'s-done':100,'s-b1':30,'s-b2':60,'s-b4':85,'s-fertig':100}
+  : {'s-fach':8,'s-quali':20,'s-erfahrung':36,'s-fs':52,'s-plz':66,'s-kontakt':82,'s-done':100,'s-b1':30,'s-b2':60,'s-b4':85,'s-fertig':100};
+var CUR = MULTI_STELLE ? 's-stelle' : 's-fach';
+var NAV_POP=false, MOUNTED=false, STARTED=false, OVBRAND=false;
+var card=document.getElementById('funnelCard');
+var funnelSec=document.querySelector('.funnel-sec');
+
+/* Overlay: Funnel als fokussierter Vollbild-Flow (kein Weg-Scrollen von der Frage) */
+function openOverlay(){
+  if(!OVBRAND){
+    OVBRAND=true;
+    var l=document.querySelector('.brand img');
+    if(l) document.getElementById('ovBrand').appendChild(l.cloneNode());
+  }
+  document.body.classList.add('funnel-open');
+  funnelSec.scrollTop=0;
+}
+function closeOverlay(){ document.body.classList.remove('funnel-open'); }
+document.getElementById('ovClose').addEventListener('click',closeOverlay);
+/* Logo im Overlay = zurück zur Startseite (Nutzer klicken intuitiv aufs Logo) */
+var ovBrand=document.getElementById('ovBrand');
+ovBrand.addEventListener('click',closeOverlay);
+ovBrand.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();closeOverlay();}});
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeOverlay(); });
+
+/* Frage-Optionen aus Konfiguration rendern (pro Kunde aus der Stellenanzeige abgeleitet) */
+function renderOptions(boxId, list, field){
+  var box=document.getElementById(boxId);
+  box.innerHTML='';
+  list.forEach(function(f){
+    var b=document.createElement('button');
+    b.type='button'; b.className='opt';
+    b.setAttribute('data-field',field);
+    b.setAttribute('data-value',f.label);
+    b.innerHTML='<span class="ico"></span><span class="lbl"></span><span class="check"></span>';
+    b.querySelector('.ico').textContent=f.icon||'👷';
+    b.querySelector('.lbl').textContent=f.label;
+    if(f.sub){ var s=document.createElement('small'); s.className='osub'; s.textContent=f.sub; b.querySelector('.lbl').appendChild(s); }
+    box.appendChild(b);
+  });
+}
+if(MULTI_STELLE) renderOptions('stelleOptions', STELLEN, 'stelle');
+renderOptions('fachOptions', FACHRICHTUNGEN, 'fachrichtung');
+renderOptions('qualiOptions', QUALIFIKATIONEN, 'qualifikation');
+renderOptions('fsOptions', FUEHRERSCHEIN, 'fuehrerschein');
+renderOptions('b1Options', ZUSATZ.verfuegbarkeit, 'verfuegbarkeit');
+renderOptions('b2Options', ZUSATZ.situation, 'situation');
+
+/* Qualifikations-Optionen passen sich der gewählten Branche an (Freddy-Regel 21.08.):
+   fachrichtungen-Eintrag kann eigene "qualifikationen" mitbringen, sonst Default */
+function renderQualiFor(fachLabel){
+  var f=null;
+  FACHRICHTUNGEN.forEach(function(x){ if(x.label===fachLabel) f=x; });
+  renderOptions('qualiOptions', (f&&f.qualifikationen)||QUALIFIKATIONEN, 'qualifikation');
+  S.qualifikation=null;
+}
+
+/* Frage 1 als Kacheln im Hero (bewährte v2-Mechanik: Bewerbung startet above the fold) */
+(function(){
+  var box=document.getElementById('heroFach');
+  var LIST  = MULTI_STELLE ? STELLEN : FACHRICHTUNGEN;
+  var FIELD = MULTI_STELLE ? 'stelle' : 'fachrichtung';
+  var SYNC  = MULTI_STELLE ? '#stelleOptions .opt' : '#fachOptions .opt';
+  LIST.forEach(function(f){
+    var b=document.createElement('button');
+    b.type='button'; b.className='htile';
+    b.setAttribute('data-value',f.label);
+    b.innerHTML='<span class="ico"></span><span class="lbl"></span><span class="arr">→</span>';
+    b.querySelector('.ico').textContent=f.icon||'👷';
+    b.querySelector('.lbl').textContent=f.label;
+    if(f.sub){ var s=document.createElement('small'); s.className='osub'; s.textContent=f.sub; b.querySelector('.lbl').appendChild(s); }
+    box.appendChild(b);
+  });
+  box.addEventListener('click',function(e){
+    var t=e.target.closest('.htile'); if(!t) return;
+    if(!STARTED){ STARTED=true; mountForms(); gcFunnelTrack('form_start',null); }
+    var val=t.getAttribute('data-value');
+    S[FIELD]=val;
+    if(!MULTI_STELLE) renderQualiFor(val);
+    /* Auswahl im Funnel-Screen synchron markieren (für Zurück-Navigation) */
+    document.querySelectorAll(SYNC).forEach(function(o){
+      o.classList.toggle('sel', o.dataset.value===val);
+    });
+    openOverlay();
+    go(MULTI_STELLE ? 's-fach' : 's-quali');
+  });
+})();
+
+/* Meta-IAB-Fix: Eingabefelder erst bei erster echter Interaktion mounten */
+function mountForms(){
+  if(MOUNTED) return; MOUNTED=true;
+  document.getElementById('plzMount').appendChild(document.getElementById('tpl-plz').content.cloneNode(true));
+  document.getElementById('kontaktMount').appendChild(document.getElementById('tpl-kontakt').content.cloneNode(true));
+  document.getElementById('b4Mount').appendChild(document.getElementById('tpl-b4').content.cloneNode(true));
+  document.getElementById('plzForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var inp=document.getElementById('plzInput'), v=inp.value.trim();
+    if(v.length<2){ inp.classList.add('bad'); inp.focus(); return; }
+    inp.classList.remove('bad'); S.plz_ort=v; go('s-kontakt');
+  });
+  document.getElementById('kontaktForm').addEventListener('submit',function(e){
+    e.preventDefault(); submit();
+  });
+  document.getElementById('b4Form').addEventListener('submit',function(e){
+    e.preventDefault(); submitProfil();
+  });
+}
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  document.getElementById('progBar').style.width=(PROG[id]||8)+'%';
+  document.getElementById('progStep').textContent = LABELS[id]||'';
+  /* Kopfzeile wechselt in Teil B; auf den Erfolgs-Screens ist sie redundant und weicht den Karten */
+  document.getElementById('funnelCard').classList.toggle('done-mode', id==='s-done'||id==='s-fertig');
+  var head=document.querySelector('.funnel-head');
+  if(id.indexOf('s-b')===0 || id==='s-fertig'){
+    head.querySelector('h2').textContent='Profil vervollständigen';
+    head.querySelector('p').textContent='Deine Bewerbung ist bereits sicher eingegangen.';
+  }
+  if(!NAV_POP && id!==CUR) history.pushState({screen:id},'');
+  CUR=id;
+  gcFunnelTrack('slide_view', id);
+  if(document.body.classList.contains('funnel-open')){ funnelSec.scrollTop=0; }
+  else{ card.scrollIntoView({behavior:'smooth',block:'start'}); }
+  var f=document.querySelector('#'+id+' input'); if(f && window.innerWidth>=768) f.focus({preventScroll:true});
+}
+
+window.addEventListener('popstate',function(e){
+  var s=e.state&&e.state.screen;
+  if(s&&document.getElementById(s)&&s!==CUR){ NAV_POP=true; openOverlay(); go(s); NAV_POP=false; }
+});
+history.replaceState({screen:CUR},'');
+
+card.addEventListener('click',function(e){
+  var back=e.target.closest('[data-back]');
+  if(back){ history.back(); return; }
+  var opt=e.target.closest('.opt');
+  if(opt&&opt.dataset.field){
+    if(!STARTED){ STARTED=true; mountForms(); gcFunnelTrack('form_start',null); }
+    openOverlay();
+    var sib=opt.parentElement.querySelectorAll('.opt');
+    sib.forEach(function(o){ o.classList.remove('sel'); });
+    opt.classList.add('sel');
+    S[opt.dataset.field]=opt.dataset.value;
+    if(opt.dataset.field==='fachrichtung') renderQualiFor(opt.dataset.value);
+    var scr=opt.closest('.screen').id;
+    setTimeout(function(){ if(CUR===scr && NEXT[scr]) go(NEXT[scr]); },260);
+  }
+});
+
+/* Teil-B-Steuerung auf dem Erfolgs-Screen */
+document.getElementById('teilbStart').addEventListener('click',function(){ go('s-b1'); });
+/* v3.5.1: "Das reicht erstmal" zeigt die Multi-Betrieb-Frage (statt sofort zu schließen) – nie zwei Karten gleichzeitig */
+document.getElementById('fertigClose').addEventListener('click',closeOverlay);
+
+/* Hero-/Topbar-CTA: Funnel als Overlay öffnen (kein Weg-Scrollen) */
+document.querySelectorAll('a[href="#bewerben"]').forEach(function(a){
+  a.addEventListener('click',function(e){ e.preventDefault(); openOverlay(); });
+});
+
+function err(msg,inp){
+  var box=document.getElementById('formErr');
+  box.textContent=msg; box.classList.add('show');
+  if(inp){ inp.classList.add('bad'); inp.focus(); }
+}
+function submit(){
+  var box=document.getElementById('formErr'); box.classList.remove('show');
+  ['fName','fTel','fMail'].forEach(function(i){ document.getElementById(i).classList.remove('bad'); });
+  var name=document.getElementById('fName').value.trim();
+  var tel=document.getElementById('fTel').value.trim();
+  var mail=document.getElementById('fMail').value.trim();
+  if(name.length<2) return err('Bitte gib deinen Namen ein.',document.getElementById('fName'));
+  if(tel.replace(/\D/g,'').length<7) return err('Bitte gib eine gültige Handynummer ein.',document.getElementById('fTel'));
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)) return err('Bitte gib eine gültige E-Mail-Adresse ein.',document.getElementById('fMail'));
+  if(!document.getElementById('fConsent').checked) return err('Bitte bestätige die Datenschutzerklärung.');
+  S.name=name; S.telefon=tel; S.email=mail;
+
+  /* Eine Lead-ID gilt für genau EINE Bewerbung: Bei einer zweiten Bewerbung im selben Tab
+     landeten Teil-B-/Multi-Upserts sonst auf der Zeile der ersten (sessionStorage-ID). */
+  try{
+    if(sessionStorage.getItem('gcf_used_'+LEAD_ID) || sessionStorage.getItem('gc_multi_'+LEAD_ID)){
+      LEAD_ID=gcUuid(); sessionStorage.setItem('gcf_lead_id',LEAD_ID);
+    }
+  }catch(e){}
+
+  var payload={
+    kunde_tab:CFG.kunde_tab, kunde:CFG.kunde, stelle:(S.stelle||CFG.stelle), quelle:CFG.quelle,
+    name:S.name, telefon:S.telefon, email:S.email,
+    fachrichtung:S.fachrichtung, qualifikation:S.qualifikation,
+    erfahrung:S.erfahrung, fuehrerschein:S.fuehrerschein,
+    plz_ort:S.plz_ort, lead_id:LEAD_ID
+  };
+  var btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Wird gesendet…';
+  fetch(CFG.webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true})
+    .then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var vn=S.name.split(' ')[0];
+      document.getElementById('doneName').textContent='Danke, '+vn+'! ';
+      /* Meta-Lead NUR nach echtem, erfolgreichem Submit (validierter State) – eventID = lead_id für CAPI-Dedup */
+      try{ if(window.fbq) fbq('track','Lead',{},{eventID:LEAD_ID}); }catch(e){}
+      gcFunnelTrack('lead_captured',null);
+      try{ sessionStorage.setItem('gcf_used_'+LEAD_ID,'1'); }catch(e){}
+      go('s-done');
+    })
+    .catch(function(){
+      btn.disabled=false; btn.innerHTML='Jetzt Job-Angebot erhalten <span class="arrow">→</span>';
+      err('Das hat leider nicht geklappt. Bitte prüfe deine Internetverbindung und versuch es noch einmal.');
+    });
+}
+
+/* Teil B: Profil-Daten als Update auf dieselbe Sheet-Zeile (lead_id-Upsert) */
+function submitProfil(){
+  S.nachricht=document.getElementById('bNachricht').value.trim();
+  var payload={
+    teil:'profil', lead_id:LEAD_ID, kunde_tab:CFG.kunde_tab, kunde:CFG.kunde,
+    verfuegbarkeit:S.verfuegbarkeit, situation:S.situation, nachricht:S.nachricht
+  };
+  var btn=document.getElementById('profilBtn');
+  btn.disabled=true; btn.textContent='Wird gesendet…';
+  fetch(CFG.webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status);
+      try{ if(window.fbq) fbq('track','CompleteRegistration',{},{eventID:LEAD_ID+'-b'}); }catch(e){}
+      gcFunnelTrack('profile_completed',null);
+      go('s-fertig'); })
+    .catch(function(){
+      btn.disabled=false; btn.innerHTML='Profil absenden <span class="arrow">→</span>';
+      alert('Das hat leider nicht geklappt – bitte versuch es noch einmal.');
+    });
+}
+
+/* v3.5: Multi-Betrieb-Einwilligung – schreibt "Ja" in Sheet-Spalte R (lead_id-Upsert) */
+function markMultiDone(){
+  document.querySelectorAll('.multiCard').forEach(function(c){
+    c.innerHTML='<p class="multi-done">✓ Alles klar! Wir melden uns, sobald ein weiterer Top-Betrieb zu dir passt.</p>';
+  });
+}
+function submitMulti(btn){
+  if(sessionStorage.getItem('gc_multi_'+LEAD_ID)){ markMultiDone(); return; }
+  btn.disabled=true; btn.textContent='Wird gesendet…';
+  fetch(CFG.webhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({teil:'multi',lead_id:LEAD_ID,kunde_tab:CFG.kunde_tab,kunde:CFG.kunde,multi:'Ja',consent_text:MULTI_CONSENT_TEXT,consent_version:MULTI_CONSENT_VERSION}),keepalive:true})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status);
+      sessionStorage.setItem('gc_multi_'+LEAD_ID,'1'); markMultiDone();
+      gcFunnelTrack('submit_success','multi-betrieb'); })
+    .catch(function(){
+      btn.disabled=false; btn.innerHTML='Weitere Top-Betriebe kennenlernen <span class="arrow">→</span>';
+      alert('Das hat leider nicht geklappt – bitte versuch es noch einmal.');
+    });
+}
+document.querySelectorAll('.multiCard').forEach(function(card){
+  var cb=card.querySelector('.multiConsent'), btn=card.querySelector('.multiBtn');
+  cb.addEventListener('change',function(){ btn.disabled=!cb.checked; });
+  btn.addEventListener('click',function(){ if(!btn.disabled) submitMulti(btn); });
+});
+</script>
+</body>
+</html>
